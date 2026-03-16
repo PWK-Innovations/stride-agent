@@ -55,3 +55,14 @@
 - Integrated logging into web search tool — success, no results, API error, and catch paths
 - Integrated logging into API route — request received, response sent, error logging
 - Created CLI test script (`scripts/test.sh`) — JSON output, exit codes, tests calculator/web search/memory/validation
+
+## 2026-03-15 — Phase 4: RAG (Retrieval-Augmented Generation)
+
+- Created 5 productivity documents in `docs/` (500-1000 words each): pomodoro-technique, time-blocking, eisenhower-matrix, daily-planning, deep-work
+- Created document loader (`src/lib/rag/loader.ts`) — reads markdown files, creates Documents with source metadata, splits with RecursiveCharacterTextSplitter (1000/200)
+- Created vector store (`src/lib/rag/store.ts`) — MemoryVectorStore singleton with text-embedding-3-small, lazy init, logs document count
+- Created RAG tool (`src/lib/tools/rag.ts`) — knowledge_base tool with similaritySearch top-3, source attribution on every result, three-point logging
+- Wired knowledgeBase into agent (`src/lib/agent.ts`) — now 3 tools: calculator, webSearch, knowledgeBase
+- Updated README.md — full project documentation with features, setup, structure, tech stack
+- Installed `@langchain/community` for additional LangChain integrations
+- Fixed loader imports: used fs + `@langchain/core/documents` + `@langchain/textsplitters` instead of deprecated `langchain/document_loaders`
