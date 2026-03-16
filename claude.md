@@ -38,6 +38,8 @@
 - Don't commit unless I ask
 - Don't push unless I ask
 - Commit messages should be clear and describe what changed
+- **Before every commit/push:** check off completed items in the relevant `ai/roadmaps/` checklist (`- [ ]` → `- [x]`) and add an entry to `ai/changelog.md`
+- **When a phase is complete:** move both the `_plan.md` and `_roadmap.md` files into `ai/roadmaps/completed/`
 
 ### Scope Discipline
 - Stick to what's asked — don't add features, refactors, or "improvements" beyond the request

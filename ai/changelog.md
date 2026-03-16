@@ -14,3 +14,12 @@
 - Created individual plan files (detailed "how") and roadmap files (checklists) for each phase
 - Completed alignment review of all plans against rubric, professor's guides, MVP, and PRD
 - Applied 6 fixes: demo video, logging retrofit timing, tool count clarity, streaming format, error recovery, session reset
+
+## 2026-03-15 — Phase 0: Project Setup
+
+- Initialized Next.js 16 with TypeScript, Tailwind CSS, ESLint, App Router
+- Installed all LangChain dependencies, mathjs, pino, zod
+- Created project directory structure (src/lib/tools, src/lib/rag, src/lib/utils, docs, scripts)
+- Added .env.example with placeholder API keys
+- Created dev.sh and build.sh scripts with exit codes + JSON output
+- Merged .gitignore with Next.js entries
