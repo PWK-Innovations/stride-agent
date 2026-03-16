@@ -1,0 +1,16 @@
+# Changelog
+
+## 2026-03-15 — Project Documentation & Planning
+
+- Created PRD (`aiDocs/prd.md`) — problem statement, features (P0/P1/P2), user stories, risks
+- Created MVP doc (`aiDocs/mvp.md`) — scope, tech stack, user flows, validation criteria
+- Created context.md (`aiDocs/context.md`) — project overview, tech stack, current focus
+- Created claude.md — behavioral guidelines, code quality rules, scope constraints
+- Created architecture doc (`aiDocs/architecture.md`) — Next.js App Router structure, request flow, agent design
+- Created coding style guide (`aiDocs/coding-style.md`) — TypeScript patterns, React/Next.js conventions, error handling
+- Pivoted tech stack from JavaScript/Express to TypeScript/Next.js
+- Scraped professor's lecture slides and created 5 reference guides in `ai/guides/`
+- Created high-level implementation plan with 6 phases (0-5) in `ai/roadmaps/`
+- Created individual plan files (detailed "how") and roadmap files (checklists) for each phase
+- Completed alignment review of all plans against rubric, professor's guides, MVP, and PRD
+- Applied 6 fixes: demo video, logging retrofit timing, tool count clarity, streaming format, error recovery, session reset
