@@ -15,49 +15,49 @@ Implement the calculator tool, web search tool, ReAct agent with conversation me
 ## Checklist
 
 ### Calculator Tool (`src/lib/tools/calculator.ts`)
-- [ ] Import `tool` from `@langchain/core/tools`, `z` from `zod`, `evaluate` from `mathjs`
-- [ ] Use `evaluate()` from mathjs — NOT `eval()` or `Function()`
-- [ ] Zod schema: `z.object({ expression: z.string() })`
-- [ ] Description explains WHEN to use: arithmetic, percentages, calculations where precision matters
-- [ ] try/catch — never throw, return error strings on failure
-- [ ] Export the tool
+- [x] Import `tool` from `@langchain/core/tools`, `z` from `zod`, `evaluate` from `mathjs`
+- [x] Use `evaluate()` from mathjs — NOT `eval()` or `Function()`
+- [x] Zod schema: `z.object({ expression: z.string() })`
+- [x] Description explains WHEN to use: arithmetic, percentages, calculations where precision matters
+- [x] try/catch — never throw, return error strings on failure
+- [x] Export the tool
 
 ### Web Search Tool (`src/lib/tools/web-search.ts`)
-- [ ] Import `TavilySearch` from `@langchain/tavily` (verify export — may be `TavilySearchResults`)
-- [ ] `maxResults: 3`
-- [ ] Format results: title, content, URL for each result
-- [ ] Async function
-- [ ] try/catch — never throw, return error strings
-- [ ] Description explains WHEN: current events, news, prices, real-time data not in training
-- [ ] Export the tool
+- [x] Import `TavilySearch` from `@langchain/tavily` (verify export — may be `TavilySearchResults`)
+- [x] `maxResults: 3`
+- [x] Format results: title, content, URL for each result
+- [x] Async function
+- [x] try/catch — never throw, return error strings
+- [x] Description explains WHEN: current events, news, prices, real-time data not in training
+- [x] Export the tool
 
 ### Conversation Memory (`src/lib/memory.ts`)
-- [ ] In-memory session store: `Record<string, BaseMessage[]>`
-- [ ] Import `HumanMessage`, `AIMessage` from `@langchain/core/messages`
-- [ ] `getMessageHistory(sessionId)` — returns or creates message array
-- [ ] `addUserMessage(sessionId, content)` — pushes HumanMessage
-- [ ] `addAssistantMessage(sessionId, content)` — pushes AIMessage
-- [ ] `clearSession(sessionId)` — deletes session
-- [ ] Export all functions
+- [x] In-memory session store: `Record<string, BaseMessage[]>`
+- [x] Import `HumanMessage`, `AIMessage` from `@langchain/core/messages`
+- [x] `getMessageHistory(sessionId)` — returns or creates message array
+- [x] `addUserMessage(sessionId, content)` — pushes HumanMessage
+- [x] `addAssistantMessage(sessionId, content)` — pushes AIMessage
+- [x] `clearSession(sessionId)` — deletes session
+- [x] Export all functions
 
 ### Agent (`src/lib/agent.ts`)
-- [ ] Import `ChatOpenAI` from `@langchain/openai`
-- [ ] Import `createReactAgent` from `@langchain/langgraph/prebuilt` (verify — slides show `createAgent` from `langchain`)
-- [ ] Model: `gpt-4o`, `temperature: 0`
-- [ ] Tools array: `[calculator, webSearch]`
-- [ ] Export the agent
+- [x] Import `ChatOpenAI` from `@langchain/openai`
+- [x] Import `createReactAgent` from `@langchain/langgraph/prebuilt` (verify — slides show `createAgent` from `langchain`)
+- [x] Model: `gpt-4o`, `temperature: 0`
+- [x] Tools array: `[calculator, webSearch]`
+- [x] Export the agent
 
 ### API Route (`src/app/api/chat/route.ts`)
-- [ ] POST handler accepts `{ message, sessionId }`
-- [ ] Validate: return 400 if message or sessionId missing
-- [ ] Add user message to session history via `addUserMessage()`
-- [ ] Get full message history via `getMessageHistory()`
-- [ ] Invoke agent: `agent.invoke({ messages }, { recursionLimit: 10 })`
-- [ ] Extract final response from `result.messages[result.messages.length - 1].content`
-- [ ] Extract `toolUsed` by inspecting intermediate ToolMessages
-- [ ] Save assistant response via `addAssistantMessage()`
-- [ ] Return `{ response, toolUsed }`
-- [ ] try/catch — return 500 with error message on failure
+- [x] POST handler accepts `{ message, sessionId }`
+- [x] Validate: return 400 if message or sessionId missing
+- [x] Add user message to session history via `addUserMessage()`
+- [x] Get full message history via `getMessageHistory()`
+- [x] Invoke agent: `agent.invoke({ messages }, { recursionLimit: 10 })`
+- [x] Extract final response from `result.messages[result.messages.length - 1].content`
+- [x] Extract `toolUsed` by inspecting intermediate ToolMessages
+- [x] Save assistant response via `addAssistantMessage()`
+- [x] Return `{ response, toolUsed }`
+- [x] try/catch — return 500 with error message on failure
 
 ## Key Files
 

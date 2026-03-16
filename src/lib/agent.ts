@@ -1,0 +1,8 @@
+import { ChatOpenAI } from "@langchain/openai";
+import { createReactAgent } from "@langchain/langgraph/prebuilt";
+import { calculator } from "./tools/calculator";
+import { webSearch } from "./tools/web-search";
+
+const model = new ChatOpenAI({ model: "gpt-4o", temperature: 0 });
+
+export const agent = createReactAgent({ llm: model, tools: [calculator, webSearch] });

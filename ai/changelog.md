@@ -23,3 +23,12 @@
 - Added .env.example with placeholder API keys
 - Created dev.sh and build.sh scripts with exit codes + JSON output
 - Merged .gitignore with Next.js entries
+
+## 2026-03-15 — Phase 1: Tools + Agent
+
+- Created calculator tool (`src/lib/tools/calculator.ts`) — mathjs evaluate, Zod schema, error handling
+- Created web search tool (`src/lib/tools/web-search.ts`) — TavilySearch, maxResults: 3, formatted output
+- Created conversation memory (`src/lib/memory.ts`) — in-memory session store with BaseMessage types
+- Created ReAct agent (`src/lib/agent.ts`) — GPT-4o, temperature 0, createReactAgent from @langchain/langgraph
+- Created API route (`src/app/api/chat/route.ts`) — POST handler with validation, tool detection, memory integration
+- Verified: calculator returns correct results, web search returns formatted results, memory persists across turns, validation returns 400
