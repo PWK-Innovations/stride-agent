@@ -43,3 +43,15 @@
 - Installed clsx for className merging
 - Excluded ai/ from tsconfig.json to avoid type-checking reference files
 - User bubbles match Send button color (olive-950), agent bubbles in olive-100
+
+## 2026-03-15 — Phase 3: Structured Logging
+
+- Created logger utility (`src/lib/utils/logger.ts`) — Pino with raw JSON output, configurable LOG_LEVEL
+- Added three-point logging per professor's slides: entry (`logToolEntry`), exit (`logToolCall`), error (`logToolError`)
+- `logToolEntry` — INFO level, logs action name + input arguments on function entry
+- `logToolCall` — INFO level, logs action + input + truncated result + success status on function exit
+- `logToolError` — ERROR level, logs action + input + error message + stack trace
+- Integrated logging into calculator tool — success and error paths
+- Integrated logging into web search tool — success, no results, API error, and catch paths
+- Integrated logging into API route — request received, response sent, error logging
+- Created CLI test script (`scripts/test.sh`) — JSON output, exit codes, tests calculator/web search/memory/validation

@@ -5,6 +5,7 @@ import {
   addUserMessage,
   addAssistantMessage,
 } from "@/lib/memory";
+import { logger } from "@/lib/utils/logger";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,6 +17,8 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    logger.info({ sessionId, message }, "[Chat API] Request received");
 
     addUserMessage(sessionId, message);
 
@@ -54,10 +57,13 @@ export async function POST(req: NextRequest) {
 
     addAssistantMessage(sessionId, responseText);
 
+    logger.info({ sessionId, toolUsed, responseLength: responseText.length }, "[Chat API] Response sent");
+
     return NextResponse.json({ response: responseText, toolUsed });
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Internal server error";
+    logger.error({ error: errorMessage }, "[Chat API] Error");
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

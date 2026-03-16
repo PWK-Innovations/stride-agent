@@ -1,11 +1,13 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import { TavilySearch } from "@langchain/tavily";
+import { logToolEntry, logToolCall, logToolError } from "../utils/logger";
 
 const tavily = new TavilySearch({ maxResults: 3 });
 
 export const webSearch = tool(
   async ({ query }): Promise<string> => {
+    logToolEntry("WebSearch", { query });
     try {
       const raw = await tavily.invoke({ query });
       let results: unknown;
@@ -25,7 +27,9 @@ export const webSearch = tool(
         "error" in results &&
         (results as { error: string }).error
       ) {
-        return `Search error: ${(results as { error: string }).error}`;
+        const errMsg = (results as { error: string }).error;
+        logToolError("WebSearch", { query }, errMsg);
+        return `Search error: ${errMsg}`;
       }
 
       const list =
@@ -37,13 +41,15 @@ export const webSearch = tool(
           : null;
 
       if (!list || list.length === 0) {
+        logToolError("WebSearch", { query }, "No results found");
         return "No results found.";
       }
 
-      return list
-        .map((r) => `**${r.title}**\n${r.content}\nURL: ${r.url}`)
-        .join("\n\n---\n\n");
+      const formatted = list.map((r) => `**${r.title}**\n${r.content}\nURL: ${r.url}`).join("\n\n---\n\n");
+      logToolCall("WebSearch", { query }, formatted);
+      return formatted;
     } catch (error) {
+      logToolError("WebSearch", { query }, error instanceof Error ? error : "Unknown error");
       return `Search failed: ${error instanceof Error ? error.message : "Unknown error"}`;
     }
   },

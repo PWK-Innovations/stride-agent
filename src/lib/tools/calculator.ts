@@ -1,13 +1,17 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import { evaluate } from "mathjs";
+import { logToolEntry, logToolCall, logToolError } from "../utils/logger";
 
 export const calculator = tool(
   async ({ expression }): Promise<string> => {
+    logToolEntry("Calculator", { expression });
     try {
       const result = evaluate(expression);
+      logToolCall("Calculator", { expression }, String(result));
       return String(result);
     } catch (error) {
+      logToolError("Calculator", { expression }, error instanceof Error ? error : "Unknown error");
       return `Error: ${error instanceof Error ? error.message : "Unknown error"}`;
     }
   },
