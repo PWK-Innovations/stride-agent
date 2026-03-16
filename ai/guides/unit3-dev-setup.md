@@ -22,12 +22,12 @@ project-root/
 │   ├── guides/
 │   ├── roadmaps/
 │   └── notes/
-├── claude.md              # ← GITIGNORED
+├── CLAUDE.md              # ← GITIGNORED
 ├── .cursorrules           # ← GITIGNORED
 └── scripts/
 ```
 
-## Claude Code Config (claude.md)
+## Claude Code Config (CLAUDE.md)
 
 ```
 Read aiDocs/context.md for project context.
@@ -77,7 +77,7 @@ Document what changed and why (not how). 1-2 lines per entry.
 
 ```
 ai/
-claude.md
+CLAUDE.md
 .cursorrules
 .testEnvVars
 node_modules/
@@ -140,8 +140,8 @@ Don't make any code changes yet.
 ## Setup Checklist
 
 1. Create GitHub repository
-2. Add .gitignore with ai/, claude.md, .cursorrules, .testEnvVars
+2. Add .gitignore with ai/, CLAUDE.md, .cursorrules, .testEnvVars
 3. Create aiDocs/ with context.md
 4. Create ai/ folder structure (guides/, roadmaps/, notes/)
-5. Create claude.md pointing to aiDocs/context.md
+5. Create CLAUDE.md pointing to aiDocs/context.md
 6. Verify AI can describe your project from aiDocs/context.md

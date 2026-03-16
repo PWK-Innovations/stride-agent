@@ -35,7 +35,7 @@ export const calculator = tool(
 );
 ```
 
-**Why mathjs over Function():** The professor's slides show `Function('"use strict"; return (' + expression + ')')()` but our `claude.md` and `coding-style.md` mandate no raw eval. `mathjs.evaluate()` is math-only — it can't execute arbitrary JS. Unit 8 slides also explicitly recommend it.
+**Why mathjs over Function():** The professor's slides show `Function('"use strict"; return (' + expression + ')')()` but our `CLAUDE.md` and `coding-style.md` mandate no raw eval. `mathjs.evaluate()` is math-only — it can't execute arbitrary JS. Unit 8 slides also explicitly recommend it.
 
 **Key rules:**
 - Never throw from inside the tool — always try/catch and return error strings

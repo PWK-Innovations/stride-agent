@@ -5,7 +5,7 @@
 - Created PRD (`aiDocs/prd.md`) — problem statement, features (P0/P1/P2), user stories, risks
 - Created MVP doc (`aiDocs/mvp.md`) — scope, tech stack, user flows, validation criteria
 - Created context.md (`aiDocs/context.md`) — project overview, tech stack, current focus
-- Created claude.md — behavioral guidelines, code quality rules, scope constraints
+- Created CLAUDE.md — behavioral guidelines, code quality rules, scope constraints
 - Created architecture doc (`aiDocs/architecture.md`) — Next.js App Router structure, request flow, agent design
 - Created coding style guide (`aiDocs/coding-style.md`) — TypeScript patterns, React/Next.js conventions, error handling
 - Pivoted tech stack from JavaScript/Express to TypeScript/Next.js
