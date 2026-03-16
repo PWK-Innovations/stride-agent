@@ -32,3 +32,14 @@
 - Created ReAct agent (`src/lib/agent.ts`) — GPT-4o, temperature 0, createReactAgent from @langchain/langgraph
 - Created API route (`src/app/api/chat/route.ts`) — POST handler with validation, tool detection, memory integration
 - Verified: calculator returns correct results, web search returns formatted results, memory persists across turns, validation returns 400
+
+## 2026-03-15 — Phase 2: Web UI
+
+- Created Message component (`src/app/components/message.tsx`) — olive bubbles, tool badges, LaTeX cleanup
+- Created Input component (`src/app/components/input.tsx`) — rounded-full input + send button, enter to submit
+- Created Chat container (`src/app/components/chat.tsx`) — session state, auto-scroll, thinking indicator, empty state
+- Updated page.tsx, layout.tsx, globals.css — olive theme, Instrument Serif + Inter fonts, Tailwind @theme
+- Updated coding-style.md with olive design system patterns
+- Installed clsx for className merging
+- Excluded ai/ from tsconfig.json to avoid type-checking reference files
+- User bubbles match Send button color (olive-950), agent bubbles in olive-100
