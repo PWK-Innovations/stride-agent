@@ -10,120 +10,94 @@ All rubric requirements are met after Phase 4. These are extra credit items that
 - `ai/guides/unit8-rag-multi-tool.md` — persistent vector store, alternative frameworks
 - `aiDocs/prd.md` — P1/P2 features
 
-## Stretch Goal 1: Streaming Responses
+## Checklist
 
-### Checklist
-- [ ] Modify API route to use `agent.stream()` instead of `agent.invoke()`
-- [ ] Return response as Server-Sent Events (`Content-Type: text/event-stream`)
-- [ ] Create `ReadableStream` that iterates over agent stream chunks
-- [ ] Format each chunk as SSE: `data: ${JSON.stringify(chunk)}\n\n` (extract text content from `chunk.agent?.messages` or `chunk.tools?.messages`)
-- [ ] Handle tool call chunks differently from text chunks — only append text content to UI
-- [ ] Send `data: [DONE]\n\n` when stream ends
-- [ ] Update chat.tsx: read stream with `res.body.getReader()`
-- [ ] Append partial content incrementally to current assistant message
-- [ ] Parse SSE format in frontend
-- [ ] Preserve non-streaming as fallback (query param or header toggle)
-- [ ] Test: responses appear token-by-token, not all at once
+### Core Requirements
+- [x] Calculator tool — evaluates math expressions
+- [x] Web search tool — searches the web using Tavily
+- [x] RAG tool — vector search over 5+ real documents, with source attribution
+- [x] Google Calendar tool — list and create events via OAuth 2.0 (4th custom tool)
+- [x] Conversation memory — multi-turn context (follow-up questions work)
+- [x] Web UI — olive-themed chat page with tool usage badges
+- [x] Structured logging — Pino JSON logs showing tool calls, arguments, and results
+- [x] Streaming — SSE-based response pipeline (text/event-stream)
+- [x] Persistent vector store — embeddings cached to disk, survive restarts
+- [x] Agent proposal — ~1 page identifying how Stride benefits from an agent pattern
 
-### Key Files
-- `src/app/api/chat/route.ts` (modify)
-- `src/app/components/chat.tsx` (modify)
+### Repo Requirements
+- [x] context.md — orients AI tools to the project
+- [x] PRD — what the agent does, its tools, the problem it solves
+- [x] Roadmap — phased plan with progress tracked
+- [x] .gitignore — no secrets, no node_modules
+- [x] Incremental git history — 5+ meaningful commits showing progression
+- [x] README.md — what it does, how to run it
 
-### Commit
-```
-git commit -m "Add streaming responses to chat UI"
-```
-
----
-
-## Stretch Goal 2: Google Calendar Tool (4th Custom Tool)
-
-### Checklist
-- [ ] `npm install googleapis`
-- [ ] Set up OAuth 2.0 credentials in Google Cloud Console
-- [ ] Add to `.env.local`: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`
-- [ ] Add to `.env.example` with placeholder values
-- [ ] Create `src/lib/tools/calendar.ts`:
-  - Import `google` from `googleapis`
-  - Initialize OAuth2 client with credentials
-  - Read events: list upcoming events for a time range
-  - Write events: create event from natural language (title, date, time)
-  - try/catch — never throw
-  - Structured logging
-- [ ] Tool description: explicit about WHEN to use (schedule, calendar, events, meetings)
-- [ ] Zod schema for input (action: "list" | "create", query details)
-- [ ] Add calendar tool to agent tools array in `src/lib/agent.ts`
-- [ ] Test: "What's on my calendar tomorrow?" → reads events
-- [ ] Test: "Add a meeting at 3pm on Monday" → creates event
-
-### Key Files
-- `src/lib/tools/calendar.ts` (create)
-- `src/lib/agent.ts` (modify — add 4th tool)
-- `.env.local`, `.env.example` (modify — add Google creds)
-
-### Commit
-```
-git commit -m "Add Google Calendar tool via OAuth 2.0"
-```
+### Deliverables
+- [x] GitHub repo with proper infrastructure and incremental history
+- [x] Working agent — four tools + memory + web UI
+- [x] README.md
+- [ ] 2-minute demo video — unedited screen capture showing agent in action
 
 ---
 
-## Stretch Goal 3: Persistent Vector Store
+## Implementation Details
 
-### Checklist
-- [ ] Create `data/` directory (add to .gitignore if large)
-- [ ] After initial embedding in `store.ts`, serialize vector store to `data/vectorstore.json`
-- [ ] On startup, check if `data/vectorstore.json` exists
-- [ ] Compare file timestamps: if vectorstore is newer than all files in `docs/`, load from file
-- [ ] If docs are newer or no cache exists, rebuild from scratch
-- [ ] Log whether loading from cache or rebuilding
-- [ ] Test: restart server → first RAG query is fast (loaded from cache)
-- [ ] Test: modify a doc → restart → rebuilds store
+### Streaming Responses
+- [x] API route sends responses as Server-Sent Events (`Content-Type: text/event-stream`)
+- [x] SSE events: `type: "tool"` (tool name), `type: "text"` (response content), `type: "done"` (final status)
+- [x] Frontend reads SSE stream with `res.body.getReader()` + `TextDecoder`
+- [x] Frontend parses SSE format and updates assistant message incrementally
+- [x] Fixed React StrictMode duplication bug (immutable state updates via `prev.map()`)
+- [x] Tool badge rendered from `type: "done"` event
+- [x] Verified: responses display without duplication
+- [x] Token-by-token streaming via `agent.streamEvents()` — words appear one at a time like ChatGPT
+- [x] Filters `on_chat_model_stream` to only emit text tokens (skips tool_call_chunks)
+- [x] Tracks tool usage from `on_tool_end` events
+- [x] Error handling for stream failures with `type: "error"` SSE event
 
-### Key Files
-- `src/lib/rag/store.ts` (modify)
+### Google Calendar Tool (4th Custom Tool)
+- [x] `npm install googleapis`
+- [x] Set up OAuth 2.0 credentials in Google Cloud Console
+- [x] Add to `.env.local`: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`
+- [x] Add to `.env.example` with placeholder values
+- [x] Create `src/lib/tools/calendar.ts` with list/create actions, structured logging
+- [x] Zod schema for input (action: "list" | "create", query details)
+- [x] Add calendar tool to agent tools array in `src/lib/agent.ts` (now 4 tools)
+- [x] Created `scripts/get-google-token.js` helper for OAuth token generation
+- [x] Test: "What's on my calendar tomorrow?" → reads events
+- [x] Test: "Add a meeting at 3pm on Monday" → creates event
 
-### Commit
-```
-git commit -m "Add persistent vector store with disk caching"
-```
+### Persistent Vector Store
+- [x] Cache embeddings to `data/vectorstore.json` after initial build
+- [x] Compare cache mtime vs docs mtime — load from cache if newer
+- [x] If docs are newer or no cache exists, rebuild from scratch
+- [x] Log whether loading from cache or rebuilding
+- [x] Test: restart server → logs show "[RAG] Loading vector store from cache"
+- [x] Test: modify a doc → restart → logs show "[RAG] Building vector store from documents"
 
----
+### Agent Proposal
+- [x] Create `aiDocs/agent-proposal.md` (~1 page, ~650 words)
+- [x] Identify a feature in the Stride project that benefits from an agent pattern
+- [x] Explain WHY the agent pattern fits (NL calendar, RAG coaching, multi-tool chaining, web search, memory)
+- [x] Mention what WOULDN'T benefit from an agent (simple CRUD, static UI, timers, data viz)
 
-## Stretch Goal 4: Agent Proposal
-
-### Checklist
-- [ ] Create `aiDocs/agent-proposal.md` (~1 page)
-- [ ] Identify a feature in the Stride project that benefits from an agent pattern
-- [ ] Explain WHY the agent pattern fits:
-  - Natural language calendar management (vs clicking UI buttons)
-  - Eisenhower prioritization via RAG (agent suggests priority based on docs)
-  - Integrated web search for context (lookup info while planning)
-  - Multi-tool chaining (e.g., check calendar + calculate available hours + suggest schedule)
-- [ ] Be specific about how it integrates into the Stride PWA
-- [ ] Mention what WOULDN'T benefit from an agent (simple CRUD operations, static UI rendering)
-
-### Key Files
-- `aiDocs/agent-proposal.md` (create)
-
-### Commit
-```
-git commit -m "Add agent proposal document"
-```
-
----
-
-## Stretch Goal 5: Demo Video
-
-### Checklist
+### Demo Video
 - [ ] Record a 2-minute screencast demonstrating the agent
-- [ ] Show calculator tool in action (math question → correct answer with tool badge)
-- [ ] Show web search tool (current events question → sourced results)
-- [ ] Show RAG tool (productivity question → answer with source attribution)
-- [ ] Show conversation memory (follow-up question referencing prior turn)
+- [ ] Show calculator, web search, RAG, and calendar tools
+- [ ] Show conversation memory (follow-up questions)
 - [ ] Show structured logging in server console
-- [ ] Optional: show any stretch features implemented (streaming, calendar, etc.)
-- [ ] Save video and add link/reference to README.md
+- [ ] Save video and add link to README.md
 
-### Key Files
-- `README.md` (modify — add demo video link)
+## Key Files
+
+| Action | File |
+|--------|------|
+| Modify | `src/app/api/chat/route.ts` — SSE streaming |
+| Modify | `src/app/components/chat.tsx` — SSE reader |
+| Create | `src/lib/tools/calendar.ts` — Google Calendar tool |
+| Modify | `src/lib/agent.ts` — add 4th tool |
+| Modify | `src/lib/rag/store.ts` — persistent cache |
+| Create | `aiDocs/agent-proposal.md` — agent proposal |
+| Create | `scripts/get-google-token.js` — OAuth helper |
+| Modify | `.env.example` — Google creds |
+| Modify | `README.md` — updated docs |

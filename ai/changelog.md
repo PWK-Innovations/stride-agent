@@ -66,3 +66,31 @@
 - Updated README.md — full project documentation with features, setup, structure, tech stack
 - Installed `@langchain/community` for additional LangChain integrations
 - Fixed loader imports: used fs + `@langchain/core/documents` + `@langchain/textsplitters` instead of deprecated `langchain/document_loaders`
+
+## 2026-03-16 — Phase 5: Stretch Goals
+
+### Streaming Responses
+- Modified API route to use `agent.streamEvents()` with SSE format (`text/event-stream`)
+- Frontend reads stream with `res.body.getReader()`, appends tokens incrementally
+- SSE events: `text` (LLM tokens), `tool` (tool name), `done` (final status with toolUsed)
+- Token-by-token streaming — words appear one at a time like ChatGPT
+- Filters `on_chat_model_stream` to only emit text tokens (skips tool_call_chunks from tool-selection LLM calls)
+- Tracks tool usage from `on_tool_end` events
+- Error handling for stream failures with `type: "error"` SSE event
+- Fixed React StrictMode duplication bug (immutable state updates via `prev.map()`)
+
+### Google Calendar Tool (4th Custom Tool)
+- Created `src/lib/tools/calendar.ts` — list and create events via OAuth 2.0
+- Zod schema for input (action: "list" | "create", query details)
+- Created `scripts/get-google-token.js` — OAuth helper that reads .env.local, opens browser for authorization
+- Added GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN to .env.example
+- Wired calendar tool into agent (now 4 tools)
+
+### Persistent Vector Store
+- Modified `src/lib/rag/store.ts` to cache embeddings to `data/vectorstore.json`
+- Compares cache mtime vs docs mtime — loads from cache if newer, rebuilds if docs changed
+- Logs `[RAG] Loading vector store from cache` or `[RAG] Building vector store from documents`
+
+### Agent Proposal
+- Created `aiDocs/agent-proposal.md` (~650 words) — identifies natural-language planning assistant as the Stride feature that benefits from an agent pattern
+- Covers why agent fits (NL calendar, RAG coaching, multi-tool chaining, web search, memory) and what doesn't need an agent (CRUD, static UI, timers)

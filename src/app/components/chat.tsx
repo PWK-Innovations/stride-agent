@@ -38,16 +38,69 @@ export default function Chat() {
         body: JSON.stringify({ message, sessionId }),
       });
 
-      const data = await res.json();
+      if (!res.body) throw new Error("No response body");
 
+      // Add placeholder assistant message
       setMessages((prev) => [
         ...prev,
-        {
-          role: "assistant",
-          content: data.response,
-          toolUsed: data.toolUsed,
-        },
+        { role: "assistant", content: "", toolUsed: null },
       ]);
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let toolUsed: string | null = null;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const data = line.slice(6);
+          if (data === "[DONE]") break;
+
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.type === "text") {
+              setMessages((prev) =>
+                prev.map((msg, i) =>
+                  i === prev.length - 1 && msg.role === "assistant"
+                    ? { ...msg, content: msg.content + parsed.content }
+                    : msg
+                )
+              );
+            } else if (parsed.type === "tool") {
+              toolUsed = parsed.name;
+            } else if (parsed.type === "done") {
+              toolUsed = parsed.toolUsed;
+            } else if (parsed.type === "error") {
+              setMessages((prev) =>
+                prev.map((msg, i) =>
+                  i === prev.length - 1 && msg.role === "assistant"
+                    ? { ...msg, content: "Sorry, something went wrong. Please try again." }
+                    : msg
+                )
+              );
+            }
+          } catch {
+            // Ignore malformed JSON chunks
+          }
+        }
+      }
+
+      // Update tool badge on final message
+      setMessages((prev) =>
+        prev.map((msg, i) =>
+          i === prev.length - 1 && msg.role === "assistant"
+            ? { ...msg, toolUsed }
+            : msg
+        )
+      );
     } catch {
       setMessages((prev) => [
         ...prev,

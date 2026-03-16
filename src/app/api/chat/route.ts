@@ -24,42 +24,85 @@ export async function POST(req: NextRequest) {
 
     const history = getMessageHistory(sessionId);
 
-    const result = await agent.invoke(
-      { messages: history },
-      { recursionLimit: 10 }
-    );
-
-    // Extract the final response text
-    const lastMessage = result.messages[result.messages.length - 1];
-    const content = lastMessage.content;
-    let responseText: string;
-
-    if (Array.isArray(content)) {
-      responseText = content
-        .filter((block) => typeof block === "object" && "type" in block && block.type === "text")
-        .map((block) => (block as { text: string }).text)
-        .join("");
-    } else {
-      responseText = typeof content === "string" ? content : String(content);
-    }
-
-    // Extract the last tool used, if any
+    // Stream token-by-token using streamEvents
+    const encoder = new TextEncoder();
     let toolUsed: string | null = null;
-    for (const msg of result.messages) {
-      if (
-        (msg.constructor?.name === "ToolMessage") ||
-        (typeof msg._getType === "function" && msg._getType() === "tool") ||
-        ("name" in msg && "tool_call_id" in msg)
-      ) {
-        toolUsed = msg.name ?? null;
-      }
-    }
+    let fullResponse = "";
 
-    addAssistantMessage(sessionId, responseText);
+    const readable = new ReadableStream({
+      async start(controller) {
+        try {
+          const stream = agent.streamEvents(
+            { messages: history },
+            { version: "v2", recursionLimit: 10 }
+          );
 
-    logger.info({ sessionId, toolUsed, responseLength: responseText.length }, "[Chat API] Response sent");
+          for await (const event of stream) {
+            // Track tool usage from tool_end events
+            if (event.event === "on_tool_end") {
+              toolUsed = event.name ?? null;
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify({ type: "tool", name: toolUsed })}\n\n`)
+              );
+            }
 
-    return NextResponse.json({ response: responseText, toolUsed });
+            // Stream text tokens from the LLM
+            if (event.event === "on_chat_model_stream") {
+              const chunk = event.data?.chunk;
+              if (!chunk) continue;
+
+              // Only emit actual text content, skip tool_call_chunks
+              const content = chunk.content;
+              if (typeof content === "string" && content.length > 0) {
+                fullResponse += content;
+                controller.enqueue(
+                  encoder.encode(`data: ${JSON.stringify({ type: "text", content })}\n\n`)
+                );
+              } else if (Array.isArray(content)) {
+                for (const block of content) {
+                  if (block.type === "text" && block.text) {
+                    fullResponse += block.text;
+                    controller.enqueue(
+                      encoder.encode(`data: ${JSON.stringify({ type: "text", content: block.text })}\n\n`)
+                    );
+                  }
+                }
+              }
+            }
+          }
+
+          // Save full response to memory
+          addAssistantMessage(sessionId, fullResponse);
+
+          logger.info(
+            { sessionId, toolUsed, responseLength: fullResponse.length },
+            "[Chat API] Response sent"
+          );
+
+          // Send done event
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify({ type: "done", toolUsed })}\n\n`)
+          );
+          controller.close();
+        } catch (error: unknown) {
+          const errorMessage =
+            error instanceof Error ? error.message : "Stream error";
+          logger.error({ error: errorMessage }, "[Chat API] Stream error");
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify({ type: "error", content: errorMessage })}\n\n`)
+          );
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(readable, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      },
+    });
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Internal server error";
