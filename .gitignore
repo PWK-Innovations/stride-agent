@@ -19,9 +19,6 @@ Thumbs.db
 .vscode/
 .idea/
 
-# AI Config
-CLAUDE.md
-
 # Build
 dist/
 build/
